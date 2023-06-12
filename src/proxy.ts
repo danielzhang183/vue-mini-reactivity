@@ -1,9 +1,13 @@
-const buckets = new Set<Function>()
+import type { EffectFn } from './effect'
+import { activeEffect } from './effect'
 
-export function createProxy<T extends Object>(data: T, effectFn: Function) {
+const buckets = new Set<EffectFn>()
+
+export function createProxy<T extends Object>(data: T) {
   return new Proxy(data, {
     get(target, key) {
-      buckets.add(effectFn)
+      if (activeEffect)
+        buckets.add(activeEffect)
       return target[key]
     },
     set(target, key, newVal) {

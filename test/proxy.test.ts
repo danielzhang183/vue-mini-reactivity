@@ -1,14 +1,18 @@
 import { describe, expect, it } from 'vitest'
-import { createProxy } from '../src'
+import { createProxy, effect } from '../src'
 
 describe('proxy', () => {
   it('exported', () => {
     const data: { text: string } = { text: 'hello world' }
-    const effect = () => { console.log('effect fn') }
-    // effect()
-    const proxy = createProxy(data, effect)
-    expect(proxy.text).toMatchInlineSnapshot('"hello world"')
+    let count = 0
+    effect(() => {
+      count++
+      console.log('effect fn')
+    })
+    const proxy = createProxy(data)
+    expect(proxy.text).toBe('hello world')
     proxy.text = 'hello vue'
-    expect(proxy.text).toMatchInlineSnapshot('"hello vue"')
+    expect(proxy.text).toBe('hello vue')
+    expect(count).toBe(2)
   })
 })
